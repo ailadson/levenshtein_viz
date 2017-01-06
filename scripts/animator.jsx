@@ -14,6 +14,9 @@ export default class Animator extends React.Component {
       currentToChar : 0
     }
 
+    this.cost = 0;
+    this.renderCurrentStep = this.renderCurrentStep.bind(this);
+
     this.interval = setInterval(() => {
       let { steps, to, done } = this.props;
       let { currentStep, currentFromChar, currentToChar, currentStr } = this.state;
@@ -21,6 +24,7 @@ export default class Animator extends React.Component {
       if(currentStep++ >= steps.length - 1) {
         clearInterval(this.interval);
         setTimeout(() => {
+          this.cost = 0;
           done();
         }, 2000)
       }
@@ -83,7 +87,9 @@ export default class Animator extends React.Component {
 
   renderCurrentStep (step) {
     let dict = { M : "Match", I : "Insert", D : "Delete", S : 'Switch' };
-    return dict[step];
+    this.cost += this.props.costs[step] || 0;
+
+    return `Current Cost: ${this.cost}  | Current Move: ${(dict[step] || "done")}`;
   }
 
   render () {
@@ -94,10 +100,14 @@ export default class Animator extends React.Component {
     className += (currentStep > -1 ? ' visible' : '')
 
     return(
-      <div>
+      <div className="anim-container">
         <div className={className}>
-          <h1>{this.renderCurrentStr()}</h1>
-          <h1>{this.renderCurrentStep(steps[currentStep])}</h1>
+          <div className="current c-string">
+            {this.renderCurrentStr()}
+          </div>
+          <div className="current-step">
+            {this.renderCurrentStep(steps[currentStep])}
+          </div>
         </div>
       </div>
     );
