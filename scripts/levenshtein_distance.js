@@ -2,8 +2,10 @@
 import Matrix from './matrix';
 
 export default class EditDistance {
-  constructor(costs) {
-    this.costs = costs;
+  constructor(config) {
+    config = config || {};
+    if (config.indel) this.indel = config.indel;
+    if (config.match) this.match = config.match;
   }
 
   getDistance(str1, str2) {
@@ -33,11 +35,11 @@ export default class EditDistance {
   }
 
   indel(char){
-    return this.costs.I;
+    return 1;
   }
 
   match(char1, char2){
-      return (char1 === char2 ? this.costs.M : this.costs.S)
+      return (char1 === char2 ? 0 : 1);
   }
 }
 

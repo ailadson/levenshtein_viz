@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import EditDistance from './levenshtein_distance';
 
 import Animator from './animator.jsx';
+import Config from './config.jsx';
 
 class Main extends React.Component {
   constructor (props) {
@@ -19,10 +20,16 @@ class Main extends React.Component {
       costs : { M : 0, D : 1, I : 1, S : 1 }
     };
 
-    this.e = new EditDistance(this.state.costs);
+    let c = this.state.costs;
+
+    this.e = new EditDistance({
+      indel (char) { return c.I },
+      match (char1, char2) { return (char1 === char2 ? c.M : c.S) }
+    });
 
     this.onStrChange = this.onStrChange.bind(this);
     this.calcDistance = this.calcDistance.bind(this);
+    this.setParams = this.setParams.bind(this);
     this.done = this.done.bind(this);
   }
 
@@ -41,6 +48,20 @@ class Main extends React.Component {
     this.setState({ str1 : '', str2 : '', animating : false, steps : '' });
   }
 
+  setParams (config) {
+    if (config.useFunction) {
+      let indel = eval(`(function(){ return function(char){\n${config.indelFunc}\n} })()`);
+      let match = eval(`(function(){ return function(char1, char2){\n${config.matchFunc}\n} })()`);
+
+      this.e = new EditDistance({ indel, match });
+    } else {
+      this.e = new EditDistance({
+        indel (char) { return config.indel },
+        match (char1, char2) { return (char1 === char2 ? config.match : config.switch) }
+      });
+    }
+  }
+
   renderAnimator () {
     if (this.state.animating) {
       return (
@@ -51,6 +72,10 @@ class Main extends React.Component {
             speed={this.state.speed}
             done={this.done}
             costs={this.state.costs} />
+      )
+    } else {
+      return (
+        <Config setParams={this.setParams}/>
       )
     }
   }
