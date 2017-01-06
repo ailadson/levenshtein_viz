@@ -12,8 +12,6 @@
     "type": "git",
     "url": "git+https://github.com/ailadson/levenshtein_viz.git"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ailadson/levenshtein_viz/issues"
